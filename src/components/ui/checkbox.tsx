@@ -39,7 +39,6 @@ const Checkbox: React.FC<CheckboxProps> = ({
   showDarkBlueTick = false,
   showBlankBoxBlackBorder = false,
   isHovered = false,
-  isFirstTimeSelection = false,
   isFirstTimeUnselection = false,
   hasBeenSelectedBefore = false,
   isTransitioning = false
