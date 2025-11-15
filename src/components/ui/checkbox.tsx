@@ -1,13 +1,91 @@
 "use client";
 
 import React from "react";
+import {
+  BlankBoxSvg,
+  GreyTickSvg,
+  BlackTickSvg,
+  LightBlueTickSvg,
+  DarkBlueTickSvg,
+  BlankBoxBlackBorderSvg
+} from './svgs';
 
 interface CheckboxProps {
   checked: boolean;
   onChange: () => void;
+  // New props to control SVG display
+  showBlankBox?: boolean;
+  showGreyTick?: boolean;
+  showBlackTick?: boolean;
+  showLightBlueTick?: boolean;
+  showDarkBlueTick?: boolean;
+  showBlankBoxBlackBorder?: boolean;
+  // Hover state from parent
+  isHovered?: boolean;
+  // Additional state flags
+  isFirstTimeSelection?: boolean;
+  isFirstTimeUnselection?: boolean;
+  hasBeenSelectedBefore?: boolean;
+  isTransitioning?: boolean;
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange }) => {
+const Checkbox: React.FC<CheckboxProps> = ({
+  checked,
+  onChange,
+  showBlankBox = false,
+  showGreyTick = false,
+  showBlackTick = false,
+  showLightBlueTick = false,
+  showDarkBlueTick = false,
+  showBlankBoxBlackBorder = false,
+  isHovered = false,
+  isFirstTimeSelection = false,
+  isFirstTimeUnselection = false,
+  hasBeenSelectedBefore = false,
+  isTransitioning = false
+}) => {
+
+  const getCurrentSVG = () => {
+    // If specific SVG flags are provided, use them (highest priority)
+    if (showBlankBox) return <BlankBoxSvg />;
+    if (showGreyTick) return <GreyTickSvg />;
+    if (showBlackTick) return <BlackTickSvg />;
+    if (showLightBlueTick) return <LightBlueTickSvg />;
+    if (showDarkBlueTick) return <DarkBlueTickSvg />;
+    if (showBlankBoxBlackBorder) return <BlankBoxBlackBorderSvg />;
+    
+    // Otherwise, use the complex logic based on state
+    if (checked) {
+      if (isTransitioning) {
+        return <LightBlueTickSvg />;
+      } else if (isHovered) {
+        if (isFirstTimeUnselection) {
+          return <LightBlueTickSvg />;
+        } else {
+          return <BlankBoxSvg />;
+        }
+      } else {
+        return <DarkBlueTickSvg />;
+      }
+    } else {
+      if (isHovered) {
+        if (!hasBeenSelectedBefore) {
+          return <GreyTickSvg />;
+        } else {
+          return <BlankBoxBlackBorderSvg />;
+        }
+      } else {
+        if (isTransitioning) {
+          return <BlackTickSvg />;
+        } else if (!hasBeenSelectedBefore) {
+          return <BlankBoxSvg />;
+        } else {
+          return <BlankBoxBlackBorderSvg />;
+        }
+      }
+    }
+  };
+
   return (
     <label className="relative inline-flex items-center cursor-pointer">
       <input
@@ -16,32 +94,8 @@ const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange }) => {
         onChange={onChange}
         className="peer hidden"
       />
-      <div className={`w-[23px] h-[23px] border rounded-md flex items-center justify-center transition-all
-        ${checked ? "bg-blue-600 border-blue-600" : "border-gray-300 bg-white"}
-      `}>
-
-        {/* ⚪ Gray tick (on hover, only when not checked) */}
-        {!checked && (
-          <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g clip-path="url(#clip0_1_200)">
-              <rect width="25" height="25" rx="6" fill="white" />
-              <rect x="0.5" y="0.5" width="24" height="24" rx="5.5" stroke="#BDBDBD" />
-              <path d="M4 12.6L10.0345 17.9672C10.055 17.9854 10.0863 17.9837 10.1047 17.9635L21 6" stroke="#E3E3E3" stroke-linecap="round" />
-            </g>
-            <defs>
-              <clipPath id="clip0_1_200">
-                <rect width="25" height="25" rx="6" fill="white" />
-              </clipPath>
-            </defs>
-          </svg>
-        )}
-        
-        {checked && (
-          <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="25" height="25" rx="6" fill="#2469F6" />
-            <path d="M4 12.6L10.0345 17.9672C10.055 17.9854 10.0863 17.9837 10.1047 17.9635L21 6" stroke="white" stroke-linecap="round" />
-          </svg>
-        )}
+      <div className="w-[23px] h-[23px] flex items-center justify-center transition-all">
+        {getCurrentSVG()}
       </div>
     </label>
   );
