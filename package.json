@@ -6,7 +6,7 @@
   },
   "scripts": {
     "dev": "next dev --turbopack",
-    "build:next": "next build",
+    "build": "next build",
     "start": "next start",
     "build-stats": "cross-env ANALYZE=true npm run build",
     "clean": "rimraf .next out coverage",

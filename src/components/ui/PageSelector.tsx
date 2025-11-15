@@ -14,14 +14,14 @@ interface PageState {
 }
 
 const PageSelector = () => {
-  const [allPageState, setAllPageState] = useState<PageState[]>([{
+  const [allPageState, setAllPageState] = useState<PageState>({
     name: "All pages",
     checked: false,
     hasBeenSelectedBefore: false,
     isFirstTimeUnselection: false,
     isTransitioning: false,
     tempHovered: false
-  }]);
+  });
 
   const [pages, setPages] = useState<PageState[]>([
     {
@@ -88,8 +88,8 @@ const PageSelector = () => {
       // UNSELECTING the page
       if (page.isFirstTimeUnselection) {
         // FIRST TIME UNSELECTION - requires double click
-        page.checked = false;
-        page.isFirstTimeUnselection = false;
+          page.checked = false;
+          page.isFirstTimeUnselection = false;
         page.isTransitioning = true; // Blink effect
       } else {
         // NOT FIRST TIME UNSELECTION - unselect immediately
@@ -116,10 +116,10 @@ const PageSelector = () => {
         setTimeout(() => {
           setPages(currentPages => {
             const blinkUpdatedPages = [...currentPages];
-            blinkUpdatedPages[index] = {
+              blinkUpdatedPages[index] = {
               ...(blinkUpdatedPages[index]!),
-              isTransitioning: false
-            };
+                isTransitioning: false
+              };
             return blinkUpdatedPages;
           });
         }, 150);
@@ -130,33 +130,22 @@ const PageSelector = () => {
   };
 
   const handleAllPageClick = () => {
-    setAllPageState(prevPages => {
-      const newPages = [...prevPages];
-      const currentPage = newPages[0];
+    setAllPageState(prevState => {
+      const updatedState = handleCheckboxInteraction(prevState);
 
-      if (!currentPage) return newPages;
-
-      const updatedPage = handleCheckboxInteraction(currentPage);
-      newPages[0] = updatedPage;
-
-      // Handle blink effect
-      if (updatedPage.isTransitioning && !updatedPage.checked) {
+      // Handle blink effect for all pages
+      if (updatedState.isTransitioning && !updatedState.checked) {
         setTimeout(() => {
-          setPages(currentPages => {
-            const blinkUpdatedPages = [...currentPages];
-            blinkUpdatedPages[0] = {
-              ...(blinkUpdatedPages[0]!),
-              isTransitioning: false
-            };
-            return blinkUpdatedPages;
-          });
+          setAllPageState(currentState => ({
+            ...currentState,
+            isTransitioning: false
+          }));
         }, 150);
       }
 
-      return newPages;
+      return updatedState;
     });
   };
-
 
   const handleMouseEnter = (index: number) => {
     setHoveredIndex(index);
@@ -186,13 +175,12 @@ const PageSelector = () => {
       if (isHovered) {
         if (!page.hasBeenSelectedBefore) {
           return { showGreyTick: true };
-        } else if(page.isTransitioning){
-          return { showLightBlueTick : true };
+        } else if (page.isTransitioning) {
+          return { showLightBlueTick: true };
         } else {
           return { showBlankBoxBlackBorder: true };
         }
       } else {
-        
         if (page.isTransitioning) {
           return { showBlackTick: true };
         } else if (!page.hasBeenSelectedBefore) {
@@ -211,24 +199,19 @@ const PageSelector = () => {
         {/* All Pages */}
         <div
           className="flex justify-between items-center h-[42px] py-3 px-[22px] cursor-pointer hover:bg-blue-50 transition-colors duration-150 rounded-md"
-          onClick={() => { handleAllPageClick }}
+          onClick={handleAllPageClick}
           onMouseEnter={() => handleMouseEnter(-1)}
           onMouseLeave={handleMouseLeave}
         >
           <span className="text-[#1F2128] font-[14px] leading-[130%] tracking-0">All pages</span>
           <Checkbox
-            checked={allPageState[0]!.checked}
-            onChange={() => {  handleAllPageClick }}
+            checked={allPageState.checked}
+            onChange={handleAllPageClick}
             isHovered={hoveredIndex === -1}
-            hasBeenSelectedBefore={true}
-            {...getCheckboxProps({
-              name: allPageState[0]!.name,
-              checked: allPageState[0]!.checked,
-              hasBeenSelectedBefore: allPageState[0]!.hasBeenSelectedBefore,
-              isFirstTimeUnselection: allPageState[0]!.isFirstTimeUnselection,
-              isTransitioning: allPageState[0]!.isTransitioning,
-              tempHovered: hoveredIndex === -1
-            }, -1)}
+            hasBeenSelectedBefore={allPageState.hasBeenSelectedBefore}
+            isFirstTimeUnselection={allPageState.isFirstTimeUnselection}
+            isTransitioning={allPageState.isTransitioning}
+            {...getCheckboxProps(allPageState, -1)}
           />
         </div>
 
