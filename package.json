@@ -1,9 +1,6 @@
 {
   "name": "ellty-first-test-assignment",
   "author": "Muhammad Bilal Nadeem Awan (https://muhammad-bilal-nadeem-awan.com)",
-  "engines": {
-    "node": ">=20"
-  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
